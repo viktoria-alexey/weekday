@@ -21,6 +21,7 @@ namespace Weekday.Data
             base.OnModelCreating(builder);
 
             builder.Entity<ApplicationUser>().HasOne(u => u.Manager).WithMany(x => x.Subordinates).HasForeignKey(x => x.ManagerId).OnDelete(DeleteBehavior.SetNull);
+            builder.Entity<ApplicationUser>().HasMany(u => u.Roles).WithOne().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<News>().HasOne(n => n.Author).WithMany(u => u.News).HasForeignKey(x => x.AuthorId).OnDelete(DeleteBehavior.SetNull);
         }

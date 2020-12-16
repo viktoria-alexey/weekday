@@ -10,5 +10,7 @@ namespace Weekday.Data.Models
 
         public virtual ICollection<ApplicationUser> Subordinates { get; set; }
         public virtual ICollection<News> News { get; set; }
+
+        public virtual ICollection<IdentityUserRole<string>> Roles { get; set; }
     }
 }

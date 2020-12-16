@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Weekday.Data.Models;
+using Weekday.Data.Interfaces;
+using Weekday.Data.Core;
+using Microsoft.AspNetCore.Identity;
 
 namespace Weekday
 {
@@ -29,6 +32,7 @@ namespace Weekday
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
@@ -42,6 +46,9 @@ namespace Weekday
             services.AddRazorPages();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
+
+            services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
+            services.AddTransient<IAccountManager, AccountManager>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
