@@ -25,6 +25,34 @@ namespace Weekday.Data.Core
             _roleManager = roleManager;
         }
 
+
+        public async Task<ApplicationUser> GetUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
+        public async Task<(ApplicationUser User, string[] Roles)?> GetUserAndRolesAsync(string userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Roles)
+                .Where(u => u.Id == userId)
+                .SingleOrDefaultAsync();
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var userRoleIds = user.Roles.Select(r => r.RoleId).ToList();
+
+            var roles = await _context.Roles
+                .Where(r => userRoleIds.Contains(r.Id))
+                .Select(r => r.Name)
+                .ToArrayAsync();
+
+            return (user, roles);
+        }
+
         public async Task<List<(ApplicationUser User, string[] Roles)>> GetUsersAndRolesAsync(int page, int pageSize)
         {
             IQueryable<ApplicationUser> usersQuery = _context.Users
@@ -63,6 +91,11 @@ namespace Weekday.Data.Core
         public async Task<IdentityRole> GetRoleByNameAsync(string roleName)
         {
             return await _roleManager.FindByNameAsync(roleName);
+        }
+
+        public async Task<IdentityRole> GetRoleByIdAsync(string roleId)
+        {
+            return await _roleManager.FindByIdAsync(roleId);
         }
 
         public async Task<(bool Succeeded, string[] Errors)> CreateRoleAsync(IdentityRole role)
@@ -148,6 +181,28 @@ namespace Weekday.Data.Core
                 return (false, result.Errors.Select(e => e.Description).ToArray());
 
             return (true, new string[] { });
+        }
+
+        public async Task<(bool Succeeded, string[] Errors)> UpdatePasswordAsync(ApplicationUser user, string currentPassword, string newPassword)
+        {
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!result.Succeeded)
+                return (false, result.Errors.Select(e => e.Description).ToArray());
+
+            return (true, new string[] { });
+        }
+
+        public async Task<bool> CheckPasswordAsync(ApplicationUser user, string password)
+        {
+            if (!await _userManager.CheckPasswordAsync(user, password))
+            {
+                if (!_userManager.SupportsUserLockout)
+                    await _userManager.AccessFailedAsync(user);
+
+                return false;
+            }
+
+            return true;
         }
 
         public async Task<(bool Succeeded, string[] Errors)> DeleteUserAsync(string userId)
