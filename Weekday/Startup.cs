@@ -24,7 +24,7 @@ namespace Weekday
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Weekday")));
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
