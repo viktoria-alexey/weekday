@@ -1,87 +1,83 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Weekday.Data.Interfaces;
+using Weekday.Data.Models;
+using Weekday.DataContracts;
+using Weekday.Miscellaneous;
 
 namespace Weekday.Controllers
 {
+    [Route("api/[controller]")]
     public class NewsController : Controller
     {
-        // GET: NewsController
-        public ActionResult Index()
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger _logger;
+
+        public NewsController(IMapper mapper, IUnitOfWork unitOfWork, ILogger<NewsController> logger)
         {
-            return View();
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
-        // GET: NewsController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet("{id}/{pageNumber:int}/{pageSize:int}")]
+        public async Task<IReadOnlyCollection<NewsDataContract>> Get(string authorId, int pageNumber, int pageSize)
         {
-            return View();
+            var news = await _unitOfWork.News.GetNewsAsync(authorId, pageNumber, pageSize);
+            return news.Select(x => _mapper.Map<NewsDataContract>(x)).ToList();
         }
 
-        // GET: NewsController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: NewsController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create([FromBody] NewsDataContract newsDataContract)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _unitOfWork.News.Add(_mapper.Map<News>(newsDataContract));
+                return Ok();
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                _logger.LogError(LoggingEvents.NewsCreatingFailed, ex, LoggingEvents.NewsCreatingFailed.Name);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        // GET: NewsController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: NewsController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpPut]
+        public ActionResult Edit([FromBody] NewsDataContract newsDataContract)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _unitOfWork.News.Update(_mapper.Map<News>(newsDataContract));
+                return Ok();
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                _logger.LogError(LoggingEvents.NewsEditingFailed, ex, LoggingEvents.NewsEditingFailed.Name);
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        // GET: NewsController/Delete/5
+        [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
         public ActionResult Delete(int id)
         {
-            return View();
-        }
+            var entity = _unitOfWork.News.Find(x => x.Id == id);
+            if (entity != null)
+            {
+                _unitOfWork.News.Remove(_mapper.Map<News>(entity));
+                return Ok();
+            }
 
-        // POST: NewsController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return BadRequest();
         }
     }
 }

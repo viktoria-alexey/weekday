@@ -49,6 +49,7 @@ namespace Weekday
 
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
             services.AddTransient<IAccountManager, AccountManager>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
