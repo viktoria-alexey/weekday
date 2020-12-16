@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weekday", "Weekday\Weekday.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weekday.Data", "Weekday.Data\Weekday.Data.csproj", "{D0F50364-EE38-430A-BB96-7271B02C73D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weekday.UnitTests", "Weekday.UnitTests\Weekday.UnitTests.csproj", "{BDFF3D4D-86C9-4623-980F-A50DB3947324}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D0F50364-EE38-430A-BB96-7271B02C73D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0F50364-EE38-430A-BB96-7271B02C73D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0F50364-EE38-430A-BB96-7271B02C73D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDFF3D4D-86C9-4623-980F-A50DB3947324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDFF3D4D-86C9-4623-980F-A50DB3947324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDFF3D4D-86C9-4623-980F-A50DB3947324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDFF3D4D-86C9-4623-980F-A50DB3947324}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,12 +11,12 @@ namespace Weekday.Data.Core
 {
     public class AccountManager : IAccountManager
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountManager(
-            ApplicationDbContext context,
+            IApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
@@ -33,47 +33,35 @@ namespace Weekday.Data.Core
 
         public async Task<(ApplicationUser User, string[] Roles)?> GetUserAndRolesAsync(string userId)
         {
-            var user = await _context.Users
-                .Include(u => u.Roles)
-                .Where(u => u.Id == userId)
-                .SingleOrDefaultAsync();
+            var user = await _context.GetUserById(userId);
 
             if (user == null)
             {
                 return null;
             }
 
-            var userRoleIds = user.Roles.Select(r => r.RoleId).ToList();
+            var userRoleIds = user.Roles?.Select(r => r.RoleId).ToList();
 
-            var roles = await _context.Roles
-                .Where(r => userRoleIds.Contains(r.Id))
-                .Select(r => r.Name)
-                .ToArrayAsync();
+            var roles = await _context.FilterRoles(userRoleIds);
 
             return (user, roles);
         }
 
         public async Task<List<(ApplicationUser User, string[] Roles)>> GetUsersAndRolesAsync(int page, int pageSize)
         {
-            IQueryable<ApplicationUser> usersQuery = _context.Users
-                .Include(u => u.Roles)
-                .OrderBy(u => u.UserName);
+            IEnumerable<ApplicationUser> usersQuery = _context.GetUsers();
 
             if (page != -1)
                 usersQuery = usersQuery.Skip((page - 1) * pageSize);
 
             if (pageSize != -1)
                 usersQuery = usersQuery.Take(pageSize);
+            
+            var userRoleIds = usersQuery.SelectMany(u => u.Roles.Select(r => r.RoleId)).ToList();
 
-            var users = await usersQuery.ToListAsync();
+            var roles = await _context.GetRoleFiltered(userRoleIds);
 
-            var userRoleIds = users.SelectMany(u => u.Roles.Select(r => r.RoleId)).ToList();
-
-            var roles = await _context.Roles
-                .Where(r => userRoleIds.Contains(r.Id))
-                .ToArrayAsync();
-
-            return users
+            return usersQuery
                 .Select(u => (u, roles.Where(r => u.Roles.Select(ur => ur.RoleId).Contains(r.Id)).Select(r => r.Name).ToArray()))
                 .ToList();
         }

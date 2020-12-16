@@ -10,11 +10,11 @@ namespace Weekday.Data
 {
     public class DatabaseInitializer : IDatabaseInitializer
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
         private readonly IAccountManager _accountManager;
         private readonly ILogger _logger;
 
-        public DatabaseInitializer(ApplicationDbContext context, IAccountManager accountManager, ILogger<DatabaseInitializer> logger)
+        public DatabaseInitializer(IApplicationDbContext context, IAccountManager accountManager, ILogger<DatabaseInitializer> logger)
         {
             _accountManager = accountManager;
             _context = context;
@@ -23,9 +23,9 @@ namespace Weekday.Data
 
         public async Task SeedAsync()
         {
-            await _context.Database.MigrateAsync().ConfigureAwait(false);
+            await _context.DatabaseMigrateAsync();
 
-            if (!await _context.Users.AnyAsync())
+            if (!await _context.AnyUsersAsync())
             {
                 _logger.LogInformation("Generating default data");
 
