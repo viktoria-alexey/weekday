@@ -43,6 +43,7 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Weekday.Data\Weekday.Data.csproj" />
+      <ProjectReference Include="..\Weekday.UnitTests\Weekday.UnitTests.csproj" />
     </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
