@@ -46,9 +46,7 @@ namespace Weekday.Controllers
 
                 ApplicationUser appUser = _mapper.Map<ApplicationUser>(user);
 
-                var roles = await GetRoleNames(user.RoleIds);
-
-                var result = await _accountManager.CreateUserAsync(appUser, roles, user.NewPassword);
+                var result = await _accountManager.CreateUserAsync(appUser, user.RoleIds, user.NewPassword);
                 if (result.Succeeded)
                 {
                     UserDataContract newUser = await GetUserFromDatabase(appUser.Id);
@@ -134,7 +132,7 @@ namespace Weekday.Controllers
                 {
                     _mapper.Map(user, appUser);
 
-                    var result = await _accountManager.UpdateUserAsync(appUser, await GetRoleNames(user.RoleIds));
+                    var result = await _accountManager.UpdateUserAsync(appUser, user.RoleIds);
                     if (result.Succeeded)
                     {
                         if (isPasswordChanged)
@@ -177,17 +175,6 @@ namespace Weekday.Controllers
             }
 
             return Ok();
-        }
-
-        private async Task<IReadOnlyCollection<string>> GetRoleNames(IEnumerable<string> roleIds)
-        {
-            var roles = new List<string>();
-            foreach (var roleId in roleIds)
-            {
-                roles.Add((await _accountManager.GetRoleByIdAsync(roleId)).Name);
-            }
-
-            return roles;
         }
 
         private async Task<UserDataContract> GetUserFromDatabase(string userId)
