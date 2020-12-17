@@ -350,7 +350,7 @@ namespace Weekday.UnitTests.Data
         }
         
         [Fact]
-        public async Task UpdateUserAsync_Success()
+        public async Task UpdateUserAsync_Fail()
         {
             // arrange
             var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
@@ -378,6 +378,286 @@ namespace Weekday.UnitTests.Data
 
             // assert
             result.Succeeded.Should().BeFalse();
+        }
+        
+        [Fact]
+        public async Task UpdateUserAsync_Success()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x => x.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult());
+            userManager.Setup(x => x.RemoveFromRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult());
+            userManager.Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new List<string>{"user role"});
+            userManager.Setup(x => x.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new TestIdentityResult());
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.UpdateUserAsync(user, new List<string>{"test"});
+
+            // assert
+            result.Succeeded.Should().BeTrue();
+        }
+        
+        [Fact]
+        public async Task UpdateUserAsync_FailToRemove()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x => x.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult());
+            userManager.Setup(x => x.RemoveFromRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult(false));
+            userManager.Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new List<string>{"user role"});
+            userManager.Setup(x => x.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new TestIdentityResult());
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.UpdateUserAsync(user, new List<string>{"test"});
+
+            // assert
+            result.Succeeded.Should().BeFalse();
+        }
+        
+        [Fact]
+        public async Task UpdateUserAsync_FailToAdd()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x => x.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult(false));
+            userManager.Setup(x => x.RemoveFromRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult());
+            userManager.Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new List<string>{"user role"});
+            userManager.Setup(x => x.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new TestIdentityResult());
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.UpdateUserAsync(user, new List<string>{"test"});
+
+            // assert
+            result.Succeeded.Should().BeFalse();
+        }
+        
+        [Fact]
+        public async Task UpdateUserAsync_NoRoles()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x => x.AddToRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult(false));
+            userManager.Setup(x => x.RemoveFromRolesAsync(It.IsAny<ApplicationUser>(), It.IsAny<IEnumerable<string>>())).ReturnsAsync(new TestIdentityResult());
+            userManager.Setup(x => x.GetRolesAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new List<string>{"user role"});
+            userManager.Setup(x => x.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new TestIdentityResult());
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.UpdateUserAsync(user);
+
+            // assert
+            result.Succeeded.Should().BeTrue();
+        }
+        
+        [Fact]
+        public async Task ResetPasswordAsync_Success()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x => x.GeneratePasswordResetTokenAsync(It.IsAny<ApplicationUser>())).ReturnsAsync("lalala");
+            userManager.Setup(x => x.ResetPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new TestIdentityResult());
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.ResetPasswordAsync(user, "pass");
+
+            // assert
+            result.Succeeded.Should().BeTrue();
+        }
+        
+        [Fact]
+        public async Task ResetPasswordAsync_Fail()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x => x.GeneratePasswordResetTokenAsync(It.IsAny<ApplicationUser>())).ReturnsAsync("lalala");
+            userManager.Setup(x => x.ResetPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new TestIdentityResult(false));
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.ResetPasswordAsync(user, "pass");
+
+            // assert
+            result.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task UpdatePasswordAsync_Success()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var user = new ApplicationUser
+            {
+                Id = "1",
+                UserName = "vika",
+                Roles = new List<IdentityUserRole<string>>
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2",
+                        UserId = "1"
+                    }
+                }
+            };
+
+            userManager.Setup(x =>
+                    x.ChangePasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new TestIdentityResult());
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.UpdatePasswordAsync(user, "pass", "pass");
+
+            // assert
+            result.Succeeded.Should().BeTrue();
+        }
+        [Fact]
+        public async Task FindByNameAsync_Success()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var role = new IdentityRole
+            {
+                Id = "id"
+            };
+            roleManager.Setup(x =>
+                    x.FindByNameAsync(It.IsAny<string>()))
+                .ReturnsAsync(role);
+            
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.GetRoleByNameAsync("name");
+
+            // assert
+            result.Should().BeEquivalentTo(role);
+        }
+
+        [Fact]
+        public async Task GetRoleByIdAsync_Success()
+        {
+            // arrange
+            var roleManager = MockHelpers.MockRoleManager<IdentityRole>();
+            var userManager = MockHelpers.MockUserManager<ApplicationUser>();
+
+            var role = new IdentityRole
+            {
+                Id = "id"
+            };
+            roleManager.Setup(x =>
+                    x.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(role);
+
+            var target = new AccountManager(_context.Object, userManager.Object, roleManager.Object);
+
+            // act
+            var result = await target.GetRoleByIdAsync("name");
+
+            // assert
+            result.Should().BeEquivalentTo(role);
         }
     }
 }
