@@ -12,14 +12,17 @@ export class AuthorizeInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return this.authorize.getAccessToken()
-      .pipe(mergeMap(token => this.processRequestWithToken(token, req, next)));
+      .pipe(mergeMap(
+        (token) => {
+          return this.processRequestWithToken(token, req, next)
+        }));
   }
 
   // Checks if there is an access_token available in the authorize service
   // and adds it to the request in case it's targeted at the same origin as the
   // single page application.
   private processRequestWithToken(token: string, req: HttpRequest<any>, next: HttpHandler) {
-    if (!!token && this.isSameOriginUrl(req)) {
+    if (!!token /*&& this.isSameOriginUrl(req)*/) {
       req = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`

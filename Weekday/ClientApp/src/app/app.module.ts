@@ -11,13 +11,20 @@ import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.
 import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { FooterComponent } from './footer/footer.component';
+import { UsersManagementComponent } from './users-management/users-management.component';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { UserInfoComponent } from './controls/user-info/user-info.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    FooterComponent
+    FooterComponent,
+    UsersManagementComponent,
+    UserInfoComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -25,8 +32,12 @@ import { FooterComponent } from './footer/footer.component';
     FormsModule,
     ApiAuthorizationModule,
     RouterModule.forRoot([
-    { path: '', component: HomeComponent, pathMatch: 'full' },
-], { relativeLinkResolution: 'legacy' })
+      { path: '', component: HomeComponent, pathMatch: 'full' },
+      { path: 'user-management', component: UsersManagementComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] },
+    ], { relativeLinkResolution: 'legacy' }),
+    NgxDatatableModule,
+    NgSelectModule,
+    ModalModule.forRoot(),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }

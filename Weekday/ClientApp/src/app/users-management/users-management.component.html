@@ -1,0 +1,42 @@
+<h4>Users management</h4>
+<div class="toolbar">
+  <a class="nav-link toolbaritem" href="javascript:;" (click)="newUser()">
+    <i class="fa fa-plus-circle"></i> New user
+  </a>
+</div>
+
+<ngx-datatable class="material colored-header sm table table-striped table-hover" [rows]="rows" [rowHeight]="35"
+  [headerHeight]="35" [footerHeight]="35" [columns]="columns" [scrollbarV]="true" [columnMode]="'force'">
+</ngx-datatable>
+
+
+<ng-template #actionsTemplate let-row="row" let-value="value" let-i="index">
+  <div>
+    <a class="btn btn-link btn-sm" href="javascript:;" (click)="editUser(row)"><i class="fa fa-pencil-square-o"
+        aria-hidden="true"></i> Edit</a>|
+    <a class="btn btn-link btn-sm" href="javascript:;" (click)="deleteUser(row)"><i class="fa fa-trash-o"
+        aria-hidden="true"></i> Delete</a>
+  </div>
+</ng-template>
+
+<ng-template #rolesTemplate let-row="row" let-value="value" let-i="index">
+  <span class="user-role badge badge-pill badge-secondary" *ngFor="let role of value">{{role}}</span>
+</ng-template>
+
+<div class="modal fade" bsModal #editorModal="bs-modal" (onHidden)="onEditorModalHidden()"
+  [config]="{backdrop: 'static'}" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 *ngIf="!editingUserName" class="modal-title float-left"><i class="fa fa-user-plus"></i> NewUser</h4>
+        <h4 *ngIf="editingUserName" class="modal-title float-left"><i class="fa fa-user-circle-o"></i> Edit User</h4>
+        <button type="button" class="close float-right" title="Close" (click)="editorModal.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-user-info #userEditor [isGeneralEditor]="true"></app-user-info>
+      </div>
+    </div>
+  </div>
+</div>

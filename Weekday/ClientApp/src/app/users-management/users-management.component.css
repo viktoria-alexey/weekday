@@ -1,0 +1,28 @@
+
+.toolbar {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.toolbaritem {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    min-width: 100px;
+    width: fit-content;
+    color: #1b6ec2;
+  }
+
+  .toolbaritem:hover {
+    color: rgba(0,0,0,.75);
+    background-color: rgba(158,158,158,0.2);
+}
+
+ngx-datatable {
+  min-height: 600px;
+}
+
+::ng-deep .datatable-header {
+  padding: .5rem 0;
+  color: #f6f6f6;
+  background-color: #1b6ec2;
+}
