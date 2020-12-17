@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,7 @@ using Weekday.Miscellaneous;
 
 namespace Weekday.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     public class NewsController : Controller
     {

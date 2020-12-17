@@ -11,6 +11,9 @@ using Weekday.Data.Models;
 using Weekday.Data.Interfaces;
 using Weekday.Data.Core;
 using Microsoft.AspNetCore.Identity;
+using AutoMapper;
+using IdentityServer4.Services;
+using System.Security.Claims;
 
 namespace Weekday
 {
@@ -38,6 +41,15 @@ namespace Weekday
             services.AddIdentityServer()
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy => {
+                    policy.RequireClaim(ClaimTypes.Role, "Administrator");
+                });
+            });
+
+            services.AddScoped<IProfileService, ProfileService>();
+
             services.AddAuthentication()
                 .AddIdentityServerJwt();
             
@@ -50,6 +62,8 @@ namespace Weekday
             services.AddTransient<IDatabaseInitializer, DatabaseInitializer>();
             services.AddTransient<IAccountManager, AccountManager>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddAutoMapper(typeof(Startup));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

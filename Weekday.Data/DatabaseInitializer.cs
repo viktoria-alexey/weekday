@@ -30,7 +30,9 @@ namespace Weekday.Data
                 _logger.LogInformation("Generating default data");
 
                 await CreateRoleAsync(UserRoles.Administrator);
-                await CreateUserAsync("admin", "admin1A_", "Inbuilt Administrator", "admin@company.com", "+375 (29) 000-0000", new string[] { UserRoles.Administrator });
+                await CreateRoleAsync(UserRoles.Employee);
+                await CreateUserAsync("admin", "Admin1_", "Inbuilt Administrator", "admin@company.com", "+375 (29) 000-0000", new string[] { UserRoles.Administrator });
+                await CreateUserAsync("employee", "Employee1_", "Inbuilt Employee", "employee@company.com", "+375 (29) 000-0000", new string[] { UserRoles.Employee });
 
                 _logger.LogInformation("Default data generated");
             }

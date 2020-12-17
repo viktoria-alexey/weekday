@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using IdentityModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,6 +14,7 @@ using Weekday.DataContracts;
 
 namespace Weekday.Controllers
 {
+    [Authorize(Policy = "AdminPolicy")]
     [Route("api/[controller]")]
     public class AdministrationController : Controller
     {
